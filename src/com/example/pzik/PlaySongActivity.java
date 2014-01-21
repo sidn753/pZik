@@ -14,14 +14,15 @@ import java.io.IOException;
 
 public class PlaySongActivity extends Activity implements OnPreparedListener, MediaController.MediaPlayerControl{
   private static final String TAG = "AudioPlayer";
-
-  public static final String AUDIO_FILE_NAME = "audioFileName";
-
   private MediaPlayer mediaPlayer;
   private MediaController mediaController;
   private SongData song;
   private String audioFile;
-
+  private String title;
+  private String duration;
+  private String size;
+  private String quality;
+  private final String playing_echec ="Can't play song!";
   private Handler handler = new Handler();
 
   public void onCreate(Bundle savedInstanceState) {
@@ -29,7 +30,14 @@ public class PlaySongActivity extends Activity implements OnPreparedListener, Me
     setContentView(R.layout.song_view);
 
     song = (SongData) this.getIntent().getParcelableExtra("songInfos");
-    ((TextView)findViewById(R.id.now_playing_text)).setText(song.title);
+    title=song.title;
+    duration=song.duration;
+    size=song.size;
+    quality=song.quality;
+    ((TextView)findViewById(R.id.now_playing_text)).setText(title);
+    ((TextView)findViewById(R.id.duration)).setText(duration);
+    ((TextView)findViewById(R.id.size)).setText(size);
+    ((TextView)findViewById(R.id.quality)).setText(quality);
     audioFile=song.link;
     mediaPlayer = new MediaPlayer();
     mediaPlayer.setOnPreparedListener(this);
@@ -42,6 +50,8 @@ public class PlaySongActivity extends Activity implements OnPreparedListener, Me
       mediaPlayer.start();
     } catch (IOException e) {
       Log.e(TAG, "Could not open file " + audioFile + " for playback.", e);
+      ((TextView)findViewById(R.id.state)).setText(playing_echec);
+
     }
 
   }

@@ -18,8 +18,9 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
-public class MainActivity extends Activity{
+public class MainActivity extends Activity {
 	public final static String EXTRA_MESSAGE = "songInfos";
 	private ListView listView;
 	private ArrayAdapter<String> listAdapter;
@@ -45,8 +46,9 @@ public class MainActivity extends Activity{
 	/** Called when user clicks on search button **/
 
 	public void searchSong(View view) {
-		
-		// String url="http://pleer.com/search?q="+songToSearch.replace(' ','+')+"&target=tracks&page=1";
+
+		// String
+		// url="http://pleer.com/search?q="+songToSearch.replace(' ','+')+"&target=tracks&page=1";
 
 		EditText editText = (EditText) findViewById(R.id.edit_message);
 		String songToSearch = editText.getText().toString().replace(' ', '+');
@@ -56,29 +58,33 @@ public class MainActivity extends Activity{
 
 		// Retrieve song list
 		new RetrieveDocTask().execute(urlskull);
-		
-		this.listView.setOnItemClickListener(new OnItemClickListener(){
+
+		this.listView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
+			public void onItemClick(AdapterView<?> parent, View view, int pos,
+					long id) {
 				// TODO Auto-generated method stub
-				Intent intent= new Intent(MainActivity.this, PlaySongActivity.class);
+				Intent intent = new Intent(MainActivity.this,
+						PlaySongActivity.class);
 				intent.putExtra(EXTRA_MESSAGE, songs.get(pos));
-		        startActivity(intent);
+				intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+				startActivity(intent);
 
 			}
-			 
+
 		});
 		// intent.putExtra(EXTRA_MESSAGE, songToSearch);
-		
+
 	}
 
-	 
 	class RetrieveDocTask extends AsyncTask<String, Void, ArrayList<SongData>> {
 
 		private ProgressDialog dialog;
+
 		protected void onPreExecute() {
-			dialog=ProgressDialog.show(MainActivity.this, "Searching", "Please wait while searching for music...");
+			dialog = ProgressDialog.show(MainActivity.this, "Searching",
+					"Please wait while searching for music...");
 		}
 
 		@Override
@@ -95,18 +101,31 @@ public class MainActivity extends Activity{
 				}
 
 			}
-			songs= SongData.getTrackFromSkullPage(doc);
+			songs = SongData.getTrackFromSkullPage(doc);
 			songName = SongData.getTitle(songs);
-			listAdapter = new ArrayAdapter<String>(MainActivity.this, R.layout.simple_row, songName);
+			listAdapter = new ArrayAdapter<String>(MainActivity.this,
+					R.layout.simple_row, songName);
 			return songs;
 		}
 
 		@Override
-		protected void onPostExecute( ArrayList<SongData> song) {
+		protected void onPostExecute(ArrayList<SongData> song) {
 			if (this.dialog.isShowing()) {
 				this.dialog.dismiss();
 			}
 			listView.setAdapter(listAdapter);
+			TextView echec = (TextView) findViewById(R.id.not_found);
+
+			if (songName.isEmpty()) {
+				listView.setVisibility(View.GONE);
+				echec.setVisibility(View.VISIBLE);
+				echec.setFocusable(true);
+			} else {
+
+				listView.setVisibility(View.VISIBLE);
+				echec.setVisibility(View.GONE);
+
+			}
 
 		}
 
