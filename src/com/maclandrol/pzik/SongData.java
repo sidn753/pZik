@@ -1,4 +1,4 @@
-package com.example.pzik;
+package com.maclandrol.pzik;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
@@ -9,6 +9,7 @@ import org.jsoup.select.Elements;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 public class SongData implements Parcelable{
 	
@@ -66,13 +67,25 @@ public class SongData implements Parcelable{
 	public static ArrayList<SongData> getTrackFromSkullPage(Document doc){
 		ArrayList<SongData> result =new ArrayList<SongData>();
 		Elements divSongs = doc.select("div#song_html");
+		
 		for(Element dSong: divSongs){
-			String text [] = dSong.getElementsByClass("left").first().html().split("<br />");
+			SongData sd=null;
+			String text []=null; 
+			String title=null, link=null;
+			try{
+			text = dSong.getElementsByClass("left").first().html().split("<br />");
 			Element rightSong=dSong.getElementById("right_song");
-			String title = rightSong.child(0).text().replace("mp3","");
-			String link = rightSong.child(2).select("a[href$=mp3]").first().attr("href");
-			SongData sd = new SongData(text, title, link);
-			result.add(sd);
+			title = rightSong.child(0).text().replace("mp3","");
+			link = rightSong.child(2).select("a[href]").first().attr("href");
+			sd = new SongData(text, title, link);
+			}catch(Exception e){
+				Log.d("href", e.getMessage());
+			}
+			if(link.endsWith(".mp3") || link.endsWith(".wav") || link.endsWith(".ogg")){
+				result.add(sd);	
+			}
+			
+
 		}
 		return result;
 		

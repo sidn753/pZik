@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.pzik"
+    package="com.maclandrol.pzik"
     android:versionCode="1"
     android:versionName="1.0" >
 
     <uses-sdk
         android:minSdkVersion="8"
-        android:targetSdkVersion="15" />
+        android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -17,8 +17,10 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.example.pzik.MainActivity"
-            android:label="@string/app_name" >
+            android:name="com.maclandrol.pzik.SearchActivity"
+            android:alwaysRetainTaskState="true"
+            android:label="@string/app_name"
+            android:launchMode="singleTask" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,9 +28,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PlaySongActivity"
+            android:name="com.maclandrol.pzik.MusicActivity"
+            android:alwaysRetainTaskState="true"
             android:label="@string/activity2" >
         </activity>
+
+        <service
+            android:name="com.maclandrol.pzik.MusicService"
+            android:enabled="true" >
+        </service>
     </application>
 
 </manifest>

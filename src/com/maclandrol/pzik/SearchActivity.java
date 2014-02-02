@@ -1,10 +1,12 @@
-package com.example.pzik;
+package com.maclandrol.pzik;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+
+import com.maclandrol.pzik.R;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -19,8 +21,9 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class MainActivity extends Activity {
+public class SearchActivity extends Activity {
 	public final static String EXTRA_MESSAGE = "songInfos";
 	private ListView listView;
 	private ArrayAdapter<String> listAdapter;
@@ -33,6 +36,15 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		// Find listView
 		this.listView = (ListView) findViewById(R.id.listView);
+		startService(new Intent(this, MusicService.class));
+
+	}
+
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		stopService(new Intent(this, MusicService.class));
 
 	}
 
@@ -65,10 +77,10 @@ public class MainActivity extends Activity {
 			public void onItemClick(AdapterView<?> parent, View view, int pos,
 					long id) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(MainActivity.this,
-						PlaySongActivity.class);
+				Intent intent = new Intent(SearchActivity.this,
+						MusicActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 				intent.putExtra(EXTRA_MESSAGE, songs.get(pos));
-				intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 				startActivity(intent);
 
 			}
@@ -83,7 +95,7 @@ public class MainActivity extends Activity {
 		private ProgressDialog dialog;
 
 		protected void onPreExecute() {
-			dialog = ProgressDialog.show(MainActivity.this, "Searching",
+			dialog = ProgressDialog.show(SearchActivity.this, "Searching",
 					"Please wait while searching for music...");
 		}
 
@@ -98,21 +110,21 @@ public class MainActivity extends Activity {
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					Toast.makeText(getApplicationContext(), "Jsoup failled",
+							Toast.LENGTH_LONG).show();
 				}
 
 			}
 			songs = SongData.getTrackFromSkullPage(doc);
 			songName = SongData.getTitle(songs);
-			listAdapter = new ArrayAdapter<String>(MainActivity.this,
+			listAdapter = new ArrayAdapter<String>(SearchActivity.this,
 					R.layout.simple_row, songName);
 			return songs;
 		}
 
 		@Override
 		protected void onPostExecute(ArrayList<SongData> song) {
-			if (this.dialog.isShowing()) {
-				this.dialog.dismiss();
-			}
+
 			listView.setAdapter(listAdapter);
 			TextView echec = (TextView) findViewById(R.id.not_found);
 
@@ -125,6 +137,9 @@ public class MainActivity extends Activity {
 				listView.setVisibility(View.VISIBLE);
 				echec.setVisibility(View.GONE);
 
+			}
+			if (this.dialog.isShowing()) {
+				this.dialog.dismiss();
 			}
 
 		}
